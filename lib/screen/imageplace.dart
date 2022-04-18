@@ -1,63 +1,103 @@
 import 'dart:async';
-
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:phone/components/imageFuction.dart';
 
 class MyHomePage extends StatefulWidget {
-  // MyHomePage({Key key, this.title}) : super(key: key);
-
   @override
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> widgetList = ["hib.jpg", "low.jpg", "vio.jpg", "high.jpg"];
-  Future<ImageInfo> getImageInfo(Image img) async {
-    final c = new Completer<ImageInfo>();
-    img.image
-        .resolve(new ImageConfiguration())
-        .addListener(new ImageStreamListener((ImageInfo i, bool _) {
-      c.complete(i);
-    }));
-    return c.future;
-  }
-
+  imageResize size = imageResize();
+  // final listdata;
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    print("device height:${devicePixelRatio}");
-    print("total height:${height}");
-    print("total width:${width}");
-    /*24 is for notification bar on Android*/
-    final double itemHeight = (height - kToolbarHeight - 24);
-    final double itemWidth = width;
-    print("height:${itemHeight}");
-    print("width:${itemWidth}");
+    double screenwidth = MediaQuery.of(context).size.width;
+    double screenheight =
+        MediaQuery.of(context).size.height - kToolbarHeight - 24;
+
+    size.imagesize(
+      screenwidth,
+      screenheight,
+    );
+    final listdata = imageResize();
+    int col = listdata.imagesize(screenwidth, screenheight)[0];
+    List<String> widgetList = listdata.imagesize(screenwidth, screenheight)[1];
+    double paddingbottom = listdata.imagesize(screenwidth, screenheight)[2];
+    double paddingtop = listdata.imagesize(screenwidth, screenheight)[3];
+    double paddingleft = listdata.imagesize(screenwidth, screenheight)[4];
+    double paddingright = listdata.imagesize(screenwidth, screenheight)[5];
+    double description1Height =
+        listdata.imagesize(screenwidth, screenheight)[6];
+    double description2Height =
+        listdata.imagesize(screenwidth, screenheight)[7];
+    double cont_actual_h_prop =
+        listdata.imagesize(screenwidth, screenheight)[8];
+    double imageActualWidth = listdata.imagesize(screenwidth, screenheight)[9];
+    double imageActualheight =
+        listdata.imagesize(screenwidth, screenheight)[10];
+    double containerActualHieght =
+        listdata.imagesize(screenwidth, screenheight)[10];
+    print("widget list ${widgetList.length}");
+    print("container propotion ${cont_actual_h_prop}");
     return Scaffold(
-      appBar: new AppBar(
-        title: new Text("gridview"),
+      appBar: AppBar(
+        title: const Text("gridview"),
       ),
-      body: Container(
-        child: GridView.count(
-          crossAxisSpacing: 3,
-          crossAxisCount: 2,
-          mainAxisSpacing: 2,
-          childAspectRatio: (itemWidth / itemHeight),
-          controller: ScrollController(keepScrollOffset: true),
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          children: widgetList.map((String value) {
-            return Container(
-              decoration: new BoxDecoration(
-                  image:  DecorationImage(
-                image: NetworkImage("https://cdn.shopify.com/s/files/1/0301/6910/4515/products/forsythia-flower-yellow-31-1_1200x.jpg?v=1584025626"),
-                fit: BoxFit.fill,
-                filterQuality:FilterQuality.high,
-              )),
-            );
-          }).toList(),
-        ),
+      body: GridView.builder(
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: col,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 0,
+            // childAspectRatio: widget.cont_actual_h_prop,
+            childAspectRatio: cont_actual_h_prop),
+        itemCount: widgetList.length,
+        itemBuilder: (context, index) {
+          return Container(
+            decoration: BoxDecoration(
+                border:
+                    Border.all(style: BorderStyle.solid, color: Colors.white)),
+            height: containerActualHieght,
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: paddingbottom,
+                  top: paddingtop,
+                  left: paddingleft,
+                  right: paddingright),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Image.asset(
+                      "asset/${widgetList[index]}",
+                      height: imageActualheight,
+                      width: imageActualWidth,
+                      filterQuality: FilterQuality.high,
+                      // fit: BoxFit.fill,
+                    ),
+                  ),
+                  // SizedBox(height: 20),
+                  Container(
+                      width: double.infinity,
+                      color: Colors.red,
+                      height: description1Height,
+                      child: Text("Flower")),
+                  // SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    color: Colors.green,
+                    height: description2Height,
+                    child: Text(
+                      "rose beautifull flower r range of colour, size,",
+                      style: TextStyle(fontSize: 12, color: Colors.purple),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
